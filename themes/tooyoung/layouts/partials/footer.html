@@ -1,0 +1,47 @@
+  <footer>
+  {{ partial "foot_custom.html" . }}
+  {{ with .Site.Params.footer }}
+  <hr/>
+  {{ . | markdownify }}
+  {{ end }}
+  </footer>
+  <script>
+    (function () {
+        var style = document.createElement("link");
+        style.rel = "stylesheet";
+        style.href  = "//cdn.bootcss.com/KaTeX/0.8.3/katex.min.css";
+        document.getElementsByTagName("head")[0].appendChild(style);
+
+        var script = document.createElement("script");
+        script.type = "text/javascript";
+        script.src  = "//cdn.bootcss.com/KaTeX/0.8.3/katex.min.js";
+        script.onload = function() {
+            var nodisplay = document.querySelectorAll("script[type=\"math\/tex\"]");
+            for(var _ in nodisplay) {
+                var cur = nodisplay[_];
+                if(!cur.innerHTML) continue;
+                var p = document.createElement("span");
+                katex.render(cur.innerHTML, p, {displayMode: false});
+                if(!cur.nextSibling)
+                    cur.parentNode.appendChild(p);
+                else
+                    cur.parentNode.insertBefore(p, cur.nextSibling);
+            }
+
+            var display = document.querySelectorAll("script[type=\"math\/tex; mode=display\"]");
+            for(var _ in display) {
+                var cur = display[_];
+                if(!cur.innerHTML) continue;
+                var p = document.createElement("span");
+                katex.render(cur.innerHTML.replace(/%.*/g, ''), p, {displayMode: true});
+                if(!cur.nextSibling)
+                    cur.parentNode.appendChild(p);
+                else
+                    cur.parentNode.insertBefore(p, cur.nextSibling);
+            }
+        };
+        document.getElementsByTagName("head")[0].appendChild(script);
+    })();
+    </script>
+  </body>
+</html>

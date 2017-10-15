@@ -1,0 +1,7 @@
+name = "tooyoung"
+features = ["blog"]
+min_version = "0.29"
+
+[Taxonomies]
+    tag = "tags"
+

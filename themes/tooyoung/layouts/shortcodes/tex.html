@@ -1,0 +1,6 @@
+{{ if len .Params | eq 1 }}
+    <script type="math/tex; mode=display">{{ .Inner }}</script>
+{{ else }}
+    <script type="math/tex">{{ .Inner }}</script>
+{{ end }}
+

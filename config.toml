@@ -1,0 +1,26 @@
+baseURL = "http://example.org/"
+languageCode = "zh-cn"
+title = "MonKey's"
+theme = "tooyoung"
+pygmentsUseClassic = true
+pygmentsCodefences = true
+pygmentsOptions = "linenos=table"
+pygmentsUseClasses = true
+
+[[menu.main]]
+    name = "Home"
+    url = "/"
+    weight = 1
+[[menu.main]]
+    name = "About"
+    url = "/about/"
+    weight = 2
+[[menu.main]]
+    name = "Categories"
+    url = "/categories/"
+    weight = 3
+[[menu.main]]
+    name = "Tags"
+    url = "/tags/"
+    weight = 4
+
