@@ -7,7 +7,7 @@ categories: 杂
 
 嘻嘻。
 
-经过一点点琢磨，我写出了 NOI Linux 下可用的一个精简 vimrc ，支持这些功能：
+经过百度，我写出了 NOI Linux 下可用的一个精简 vimrc ，支持这些功能：
 
 1. 基本兼容 DevC++ 的 编译 `<C-F9>` 运行 `<C-F10>` 快捷键。
 2. <del>可视模式下 `<C-/>` 给一段代码添加删除整齐的注释。</del> ( 懒得弄了 )
@@ -25,7 +25,7 @@ set expandtab
 set colorcolumn=80
 
 function CompileProg()
-    :make %:r
+    :make %:r CXXFLAGS="-Wall"
 endfunction
 
 function ExecuteProg()
