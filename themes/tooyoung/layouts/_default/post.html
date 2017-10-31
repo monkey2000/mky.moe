@@ -6,6 +6,7 @@
 </div>
 
 <main>
+{{ if isset .Params "toc" }} {{ .TableOfContents }} {{ end }}
 {{ .Content }}
 </main>
 
