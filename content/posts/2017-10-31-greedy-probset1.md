@@ -235,3 +235,96 @@ int main() {
     printf("%lld\n", ans);
 }
 ```
+
+## CF769C. Cycle In Maze
+
+### 题面
+
+> 给一个迷宫，找一个从起点开始的长度恰好为 k 的字典序最小的回路。
+> 字典序为 "D, L, R, U" 表示上下左右单词首字母。
+
+### 做法
+
+先跑一个 BFS 求出每个点到起点的最短路距离，我们称一个点可到达仅当它到起点的最短距离不超过剩余能走的步数。
+
+构造答案就是按照字典序枚举下一个能走的位置，然后走过去。
+
+### 代码
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+const int SIZ = 2007;
+typedef pair<int, int> pii;
+
+int N, M, K;
+char Mat[SIZ][SIZ];
+
+// D L R U
+char rep[] = {'D', 'L', 'R', 'U'};
+int dx[] = {1, 0, 0,-1};
+int dy[] = {0,-1, 1, 0};
+
+bool valid_pos(int x, int y) {
+    return 1 <= x && x <= N && 1 <= y && y <= M && Mat[x][y] != '*';
+}
+
+int dis[SIZ][SIZ];
+void bfs(int ix, int iy) {
+    queue<pii> q; q.push(pii(ix, iy));
+    dis[ix][iy] = 0;
+    while(!q.empty()) {
+        int x = q.front().first, y = q.front().second; q.pop();
+        for(int i=0;i<4;i++) {
+            int cx = x + dx[i], cy = y + dy[i];
+            if(valid_pos(cx, cy) && dis[cx][cy] == 0x3f3f3f3f) {
+                dis[cx][cy] = dis[x][y] + 1;
+                q.push(pii(cx, cy));
+            }
+        }
+    }
+}
+
+vector<char> ans;
+
+bool construct(int x, int y) {
+    ans.reserve(K);
+
+    for(int i=0;i<K;i++) {
+        int nx = -1, ny = -1;
+        for(int j=0;j<4;j++) {
+            int cx = x + dx[j], cy = y + dy[j];
+            if(valid_pos(cx, cy) && dis[cx][cy] < (K - i)) {
+                nx = cx, ny = cy;
+                ans.push_back(rep[j]);
+                break;
+            }
+        }
+
+        if(nx == -1 && ny == -1) return false;
+        else x = nx, y = ny;
+    }
+
+    return true;
+}
+
+int main() {
+    scanf("%d %d %d", &N, &M, &K);
+
+    for(int i=1;i<=N;i++)
+        scanf("%s", Mat[i] + 1);
+
+    int ix, iy;
+    for(int i=1;i<=N;i++)
+        for(int j=1;j<=M;j++)
+            if(Mat[i][j] == 'X') { ix = i, iy = j; break; }
+
+    memset(dis, 0x3f, sizeof(dis));
+    bfs(ix, iy);
+
+    if(construct(ix, iy) && ans.size() == K) {
+        for(char c : ans) putchar(c);
+        puts("");
+    } else puts("IMPOSSIBLE");
+}
+```
