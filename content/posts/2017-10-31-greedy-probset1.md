@@ -132,7 +132,8 @@ int main() {
 using namespace std;
 typedef long long LL;
 const int SIZ = 1e6 + 2007;
-const LL llinf = (numeric_limits<LL>::max()>>1) - numeric_limits<int>::max();
+const LL llinf = (numeric_limits<LL>::max()>>1) -
+        numeric_limits<int>::max();
 
 int N, A, B;
 int S[SIZ];
@@ -204,7 +205,9 @@ void update(int ft) {
 
         dp[i][1] = min(dp[i-1][0] + A, dp[i-1][1] + A);
         
-        if(mrk[i] != 2) dp[i][2] = min(min(llinf, dp[i-1][1] + 1LL * mrk[i] * B), dp[i-1][2] + 1LL * mrk[i] * B);
+        if(mrk[i] != 2)
+	    dp[i][2] = min(min(llinf, dp[i-1][1] + 1LL * mrk[i] * B),
+	        dp[i-1][2] + 1LL * mrk[i] * B);
         else dp[i][2] = llinf;
     }
 
