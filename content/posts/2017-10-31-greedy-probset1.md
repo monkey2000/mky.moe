@@ -426,3 +426,243 @@ int main() {
 }
 ```
 
+## CF870B. Maximum of Maximums of Minimums
+
+能分三段以上的时候一定可以把最大值单独分在一段。
+
+其他时候暴力。
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+const int SIZ = 4e5 + 2007;
+
+int N, K;
+int A[SIZ], Pre[SIZ], Pos[SIZ];
+
+int main() {
+    cin >> N >> K;
+    for(int i=1;i<=N;i++) cin >> A[i];
+    Pre[0] = Pos[N+1] = numeric_limits<int>::max();
+    for(int i=1;i<=N;i++) Pre[i] = min(Pre[i-1], A[i]);
+    for(int i=N;i>=1;i--) Pos[i] = min(Pos[i+1], A[i]);
+
+    int ans = numeric_limits<int>::min();
+    if(K == 1) ans = Pos[1];
+    else if(K == 2) {
+        for(int i=1;i<N;i++) {
+            ans = max(ans, max(Pre[i], Pos[i+1]));
+        }
+    } else
+        ans = *max_element(A+1, A+N+1);
+
+    printf("%d\n", ans);
+}
+```
+
+## CF870C. Maximum splitting
+
+注意到样例答案中总是有 4 ，而 4 也是最小的质完全平方数，所以往这个方向想。
+
+1. 如果模 4 余 0，可以分解成 n * 4
+2. 如果模 4 余 1，可以分解成 n * 4 + 9
+3. 如果模 4 余 2，可以分解成 n * 4 + 6
+4. 如果模 4 余 3，可以分解成 n * 4 + 6 + 9
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+int Q;
+int ans[61];
+
+int main() {
+    cin >> Q;
+    for(int i=1;i<=60;i++) ans[i] = -1;
+    for(int i=4;i<=60;i+=4) ans[i] = i / 4;
+    for(int i=9;i<=60;i+=4) ans[i] = ((i - 9) / 4) + 1;
+    for(int i=6;i<=60;i+=4) ans[i] = ((i - 6) / 4) + 1;
+    for(int i=15;i<=60;i+=4) ans[i] = ((i - 15) / 4) + 2;
+
+    int x;
+    while(Q--) {
+        cin >> x;
+        int a = (x / 20) * 5;
+        int b = x % 20;
+        int k = min(3, a);
+        a -= k, b += 4 * k;
+        cout << a + ans[b] << endl;
+    }
+}
+```
+
+## CF873C. Strange Game On Matrix
+
+每列分开做，滑动窗口维护。
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+const int SIZ = 207;
+typedef pair<int, int> pii;
+
+int N, M, K;
+int Mat[SIZ][SIZ];
+
+pii solve(int *p) {
+    int tot = 0;
+    for(int i=1;i<=K;i++) tot += p[i];
+    int rem = 0, ansrem = 0, anscnt = 0;
+    for(int i=1;i<=N;i++) {
+        if(p[i] && tot > anscnt) {
+            ansrem = rem, anscnt = tot;
+        }
+
+        tot -= p[i];
+        rem += p[i];
+
+        tot += p[i+K];
+    }
+
+    return pii(anscnt, ansrem);
+}
+
+int main() {
+    cin >> N >> M >> K;
+
+    for(int i=1;i<=N;i++) {
+        for(int j=1;j<=M;j++) {
+            cin >> Mat[j][i];
+        }
+    }
+
+    pii ans(0, 0);
+
+    for(int i=1;i<=M;i++) {
+        pii cur = solve(Mat[i]);
+        ans.first += cur.first;
+        ans.second += cur.second;
+    }
+
+    cout << ans.first << " "<< ans.second << endl;
+}
+```
+
+## CF864C. Bus
+
+模拟即为最优情况，当时似乎写了个假二分答案增加常数（大雾）。
+
+```cpp
+#include <iostream>
+#include <cstdio>
+#include <cstdlib>
+#include <algorithm>
+using namespace std;
+typedef long long LL;
+
+int A, B, F, K;
+
+bool check(int tot) {
+    //printf("Check %d\n", tot);
+    LL pos = 0, end = 1LL * A * K;
+
+    // P_1 = 2m * K + F
+    // P_2 = 2(m+1) * K - F
+    // m \in N
+
+    while(pos < end && tot > 0) {
+        if(pos + B >= end) { pos += B; break; }
+
+        LL m1 = -1, m2 = -1;
+
+        m1 = (pos + B - F) / (A<<1);
+        if(F != A) m2 = (pos + B + F - (A<<1)) / (A<<1);
+
+        LL pos1 = m1 >= 0 ? (m1<<1) * A + F : -1;
+        LL pos2 = m2 >= 0 ? ((m2+1)<<1) * A - F : -1;
+
+        if(pos1 - pos > B) pos1 = -1;
+        if(pos2 - pos > B) pos2 = -1;
+
+        //printf("%d %d %d %d\n", m1, m2, pos1, pos2);
+
+        LL mmpos = max(pos1, pos2);
+
+        //printf("%lld -> %lld\n", pos, mmpos);
+
+        if(mmpos > pos) pos = mmpos;
+        else return false;
+
+        --tot;
+    }
+
+    return (pos >= end) || (pos + B >= end && tot >= 0);
+}
+
+int main() {
+    scanf("%d %d %d %d", &A, &B, &F, &K);
+
+    int L = 0, R = K + 2; // [L, R]
+
+    while(L != R) {
+        int Mid = (L + R) >> 1;
+
+        bool cur = check(Mid);
+        //printf("Check %d = %d\n", Mid, cur);
+
+        if(cur) {
+            R = Mid;
+        } else {
+            L = Mid + 1;
+        }
+    }
+
+    if(check(L)) {
+        printf("%d\n", L);
+    } else {
+        printf("%d\n", -1);
+    }
+}
+```
+
+## CF863B. Kayaking
+
+暴力
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+const int SIZ = 207;
+
+int N, M;
+int W[SIZ];
+
+int main() {
+    cin >> N;
+    M = N<<1;
+    
+    for(int i=1;i<=M;i++) {
+        cin >> W[i];
+    }
+
+    sort(W+1, W+M+1);
+
+    int ans = numeric_limits<int>::max();
+    for(int i=1;i<=M;i++) {
+        for(int j=i+1;j<=M;j++) {
+            int tot = 0;
+            for(int k=1;k<=M;) {
+                if(k == i || k == j) { k++; continue; }
+                int a = k, b = k + 1;
+                while(b == i || b == j) b++;
+                tot += W[b] - W[a];
+                k = b + 1;
+            }
+            
+            ans = min(ans, tot);
+        }
+    }
+
+    cout << ans << endl;
+}
+```
