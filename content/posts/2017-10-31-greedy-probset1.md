@@ -328,3 +328,101 @@ int main() {
     } else puts("IMPOSSIBLE");
 }
 ```
+
+## CF708C. Centroids
+
+### 题面
+
+> 树上的重心满足删掉它之后最大的一个联通块小于 `N/2`
+> 
+> 现在给一棵树，求在修改一条边的情况下，有哪些点可以成为树的重心
+> 
+> 树的大小 <= 4e5
+
+### 做法
+
+考虑树的原重心，如果有一个点可以成为重心的话，那么一定是这个原重心上拽下来了一个儿子，再接到新重心上。
+
+{{< tex >}} O(N) {{< /tex >}} 可过
+
+### 代码
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+const int SIZ = 400000 + 2007;
+const int _inf = 0x3f3f3f3f;
+typedef pair<int, int> pii;
+
+int N;
+vector<int> G[SIZ];
+
+int siz[SIZ], mx[SIZ], center;
+void dfs1(int u = 1, int pre = 0) {
+    siz[u] = 1;
+    
+    for(int v : G[u]) {
+        if(v != pre) {
+            dfs1(v, u);
+            mx[u] = max(mx[u], siz[v]);
+            siz[u] += siz[v];
+        }
+    }
+
+    mx[u] = max(mx[u], N - siz[u]);
+
+    if(mx[u] < mx[center]) {
+//      assert(mx[u] != mx[center]);
+        center = u;
+    }
+}
+
+vector<pii> ch;
+int ans[SIZ];
+
+void dfs2(int u, int pre, int sel, int cnt) {
+    if(cnt <= (N>>1)) ans[u] = 1;
+    
+    int k = 0;
+    for(pii p : ch) {
+        k++; if(k > 2) break;
+        if(p.second == sel) continue;
+        if(N - siz[u] - p.first <= (N>>1)) ans[u] = 1;
+    }
+
+    for(int v : G[u]) {
+        if(v != pre) dfs2(v, u, sel, cnt);
+    }
+}
+
+int main() {
+    cin >> N;
+
+    int u, v;
+    for(int i=1;i<N;i++) {
+        cin >> u >> v;
+        G[u].push_back(v);
+        G[v].push_back(u);
+    }
+
+    mx[center] = _inf;
+    dfs1();
+    assert(center != 0);
+    dfs1(center);
+
+    ans[center] = 1;
+
+    for(int v : G[center]) {
+        ch.push_back(pii(siz[v], v));
+    }
+
+    sort(ch.begin(), ch.end(), greater<pii>());
+
+    for(int v : G[center]) {
+        dfs2(v, center, v, N - siz[v]);
+    }
+
+    for(int i=1;i<=N;i++) printf("%d ", ans[i]);
+    puts("");
+}
+```
+
