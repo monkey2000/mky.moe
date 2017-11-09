@@ -20,7 +20,7 @@ tags: [数论, 逆元]
 
 带回：
 
-{{< tex display >}} Inv[i] = (M - M/i) * Inv[M \% i] \% M {{< /tex >}}
+{{< tex display >}} Inv[i] = (M - M/i) * Inv[M \bmod i] \bmod M {{< /tex >}}
 
 易知递推边界：
 
